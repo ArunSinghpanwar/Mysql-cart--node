@@ -122,6 +122,7 @@ class UserController {
             })
 
         } catch (error) {
+
             res.send(error);
 
         }
