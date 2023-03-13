@@ -73,11 +73,8 @@ class UserController {
                 if (err) {
                     throw err
                 }
-
                 const userEncryptedPassword = JSON.parse(JSON.stringify(result[0]))
                 console.log(userEncryptedPassword.Password);
-
-
                 connection.query(userID, (err, fields) => {
 
                     if (err) {
@@ -90,26 +87,33 @@ class UserController {
 
                         if (!isPasswordCorrect) return res.status(404).json("Wrong password or UserName")
 
-
-                        const token = jwt.sign({ id: data[0].id, }, "sdsdsd");
+                        const token = jwt.sign({ id: data[0].id, }, "sdsdsd", { expiresIn: '1h' });
 
 
                         connection.query(loginuser, (err, result) => {
                             if (!err) {
                                 res.cookie("access_token", token, {
                                     httpOnly: true
-                                }).status(200).json({
-                                    UserID: data[0].id,
-                                    Status: "Sucess",
-                                    Message: "Welcome to shoping cart",
-
                                 })
-                            } else {
+                                    .status(200).json({
+
+                                        UserID: data[0].id,
+
+                                        Status: "Sucess",
+
+                                        Message: "Welcome to shoping cart",
+
+                                    })
+
+                            }
+                            else {
                                 console.log(err);
-                                return res.status(403).json({
-                                    Status: "Fail",
-                                    Message: "Invalid USERNAME or PASSWORD",
-                                });
+
+                                return res.status(403)
+                                    .json({
+                                        Status: "Fail",
+                                        Message: "Invalid USERNAME or PASSWORD",
+                                    });
                             }
                         });
 
