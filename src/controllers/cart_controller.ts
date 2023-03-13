@@ -1,7 +1,6 @@
-import { Request, Response } from "express";
+import { json, Request, Response } from "express";
 import { connection } from "../Db_conncetion/db";
 import jwt from 'jsonwebtoken';
-
 
 class CartController {
     async getAllProduct(req: Request, res: Response) {
@@ -25,52 +24,29 @@ class CartController {
     async addCart(req: Request, res: Response) {
         try {
             const { id, Product_id } = req.params;
-
-            if (
-                !req.headers.authorization
-            ) {
-                return res.status(400).json({
-                    message: "Please provide the token",
-                });
-            }
-
-
-            let theToken = req.headers.authorization
-            jwt.verify(theToken, 'the-super-strong-secrect', (err: any, decode) => {
-
-
-                if (err)
+            let findproduct = ` select * from cart where product_id = ${(Product_id)}`;
+            connection.query(findproduct, (err, result) => {
+                if (err) {
                     return res.send(err);
-                else {
-                    let findproduct = ` select * from cart where product_id = ${(Product_id)}`;
-                    connection.query(findproduct, (err, result) => {
+                }
+                if (result.length > 0) {
+                    let updateQunatity = `update cart set quantity= quantity + 1 where product_id = ${Product_id} `;
+                    connection.query(updateQunatity, (err, result) => {
+                        if (err) throw err;
+                        return res.send(result);
+                    });
+                } else {
+                    const addcart = `insert into cart (Product_id,person_id,quantity) values (${Product_id},${id},1)`;
+                    connection.query(addcart, (err, result) => {
                         if (err) {
+                            console.log(err);
                             return res.send(err);
-                        }
-
-                        if (result.length > 0) {
-                            let updateQunatity = `update cart set quantity= quantity + 1 where product_id = ${Product_id} `;
-                            connection.query(updateQunatity, (err, result) => {
-                                if (err) throw err;
-                                return res.send(result);
-                            });
                         } else {
-                            const addcart = `insert into cart (Product_id,person_id,quantity) values (${Product_id},${id},1)`;
-                            connection.query(addcart, (err, result) => {
-                                if (err) {
-                                    console.log(err);
-                                    return res.send(err);
-                                } else {
-                                    return res.send(result);
-                                }
-                            });
+                            return res.send(result);
                         }
                     });
-
                 }
-            })
-
-
+            });
 
         } catch (error) {
 
