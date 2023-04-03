@@ -10,6 +10,7 @@ router.get('/LoginUser', user_controller.loginUser);
 
 router.put('/Add-Cart/:id/:Product_id', TokenVerify.verfiyToken, cart_controller.addCart);
 router.get('/GetProducts', cart_controller.getAllProduct);
-router.delete('/Remove-cart/:id/:Product_id', cart_controller.removeCart);
+router.delete('/Remove-cart/:id/:Product_id', TokenVerify.verfiyToken, cart_controller.removeCart);
+router.get('/ProductByUserId/:id', TokenVerify.verfiyToken, cart_controller.userDataById)
 
 export = router;
